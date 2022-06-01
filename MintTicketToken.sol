@@ -6,19 +6,26 @@ import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 
 
 contract MintTicketToken is ERC721Enumerable{
-    constructor() ERC721("h662Animals","HAS"){}
+    constructor() ERC721("h662Animals","HAS"){
+        owner = msg.sender;
+    }
+    address owner;
 
-
-    function mintTicketToken(uint ticketAmount) public returns(uint256[] memory) {
+    function mintTicketToken(uint ticketAmount) public payable returns(uint256[] memory) {
         
         uint256[] memory onSaleTicketTokenArray = new uint256[](ticketAmount);
 
+        require(msg.value> 0, "You have to pay Ether for nft issuance.");
+
+        payable(owner).transfer(msg.value);
+
+        
         for(uint256 i =0 ; i<ticketAmount; i++){
             uint256 ticketTokenId = totalSupply() + 1;//nft가 가질수 있는 유일한 id인데 ERC721Enumerable에서 제공.. 지금까지 발행된 nft양        
             _mint(msg.sender,ticketTokenId); // 주인, 유일id - nft를 증명하는 토큰아이디
             onSaleTicketTokenArray[i]=ticketTokenId;
         }
-
+        
         return onSaleTicketTokenArray;
         
     }
